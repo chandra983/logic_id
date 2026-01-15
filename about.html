@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIC_ID // ABOUT_SYSTEM</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#030305',
+                        card: '#0a0a0f',
+                        panel: '#12121a',
+                        neon: '#00ff88',
+                        'neon-dim': 'rgba(0, 255, 136, 0.05)',
+                        'neon-pink': '#ff00ff',
+                        'neon-blue': '#00d4ff',
+                        border: '#2a2a3a',
+                    },
+                    fontFamily: {
+                        heading: ['Orbitron', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px)",
+                        'circuit': "url('https://www.transparenttextures.com/patterns/circuit-board.png')",
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scan': 'scan 3s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CORE VARIABLES */
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        body { background-color: #030305; color: #e0e0e0; }
+
+        /* VISUAL FX: SCANLINES */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.2) 2px, rgba(0, 0, 0, 0.2) 4px);
+            pointer-events: none; z-index: 40;
+        }
+
+        /* GEOMETRY: CHAMFERED CORNERS */
+        .cyber-cut { clip-path: polygon(0 15px, 15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%); }
+        .cyber-cut-sm { clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%); }
+        .cyber-cut-tr { clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%); }
+
+        /* FX: GLITCH TEXT */
+        .glitch-wrapper { position: relative; display: inline-block; }
+        .glitch { position: relative; color: white; mix-blend-mode: lighten; }
+        .glitch::before, .glitch::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #030305;
+        }
+        .glitch::before { text-shadow: -2px 0 #00ff88; clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); transform: translate(-4px, 0); animation: glitch-tear-1 3s infinite linear alternate-reverse; }
+        .glitch::after { text-shadow: 2px 0 #00d4ff; clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); transform: translate(4px, 0); animation: glitch-tear-2 2.5s infinite linear alternate-reverse; }
+        
+        @keyframes glitch-tear-1 {
+            0% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(-5px, 1px); }
+            20% { clip-path: polygon(0 40%, 100% 40%, 100% 50%, 0 50%); transform: translate(5px, -1px); }
+            40% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translate(0, 0); }
+            60% { clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%); transform: translate(-5px, 2px); }
+            100% { clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%); transform: translate(3px, -2px); }
+        }
+        @keyframes glitch-tear-2 {
+            0% { clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%); transform: translate(5px, -1px); }
+            30% { clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%); transform: translate(-4px, 1px); }
+            50% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translate(0, 0); }
+            80% { clip-path: polygon(0 50%, 100% 50%, 100% 60%, 0 60%); transform: translate(4px, -2px); }
+            100% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(-3px, 2px); }
+        }
+
+        /* LAYOUT: SIDEBAR TRANSITION */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: var(--sidebar-width); flex-shrink: 0; }
+        .nav-label { transition: opacity 0.2s ease; white-space: nowrap; }
+        .collapsed .nav-label { opacity: 0; visibility: hidden; pointer-events: none; position: absolute; }
+        .collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
+        .collapsed nav a i { margin-right: 0; }
+
+        /* FAQ ACCORDION STYLING */
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary ~ * { animation: sweep .3s ease-in-out; }
+        @keyframes sweep { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030305; }
+        ::-webkit-scrollbar-thumb { background: #2a2a3a; }
+        ::-webkit-scrollbar-thumb:hover { background: #00ff88; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+        /* MOBILE SIDEBAR */
+        @media (max-width: 768px) {
+            #sidebar { 
+                position: fixed; height: 100%; z-index: 100; transform: translateX(-100%); 
+                transition: transform 0.3s ease; width: 280px !important; 
+            }
+            #sidebar.mobile-active { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="font-mono overflow-hidden bg-void selection:bg-neon selection:text-void">
+    <div class="scanlines"></div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside id="sidebar" class="relative z-[60] h-full bg-card border-r border-border flex flex-col shadow-[5px_0_15px_rgba(0,0,0,0.5)]">
+            <div class="h-20 flex items-center px-6 border-b border-border overflow-hidden shrink-0">
+                <div class="flex items-center gap-4 min-w-[200px]">
+                    <div class="w-10 h-10 bg-neon flex items-center justify-center cyber-cut-sm shadow-[0_0_10px_#00ff88]">
+                        <i class="bi bi-cpu-fill text-void text-xl"></i>
+                    </div>
+                    <span class="nav-label font-heading font-black text-xl tracking-tighter text-white">LOGIC<span class="text-neon">_ID</span></span>
+                </div>
+            </div>
+
+            <button onclick="toggleSidebar()" class="hidden md:flex absolute -right-3 top-24 w-6 h-12 bg-card border border-border text-neon items-center justify-center hover:bg-neon hover:text-void transition-all z-50 cyber-cut-sm">
+                <i id="toggle-icon" class="bi bi-chevron-left text-xs"></i>
+            </button>
+
+            <nav class="flex-1 py-10 px-4 space-y-2 overflow-y-auto scrollbar-hide">
+                <a href="index.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-white transition-all mb-4">
+                    <i class="bi bi-grid-1x2-fill text-xl w-8 text-center group-hover:text-white"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">BERANDA</span>
+                </a>
+                
+                <a href="about.html" class="group flex items-center gap-5 p-3 text-neon bg-neon-dim border-r-4 border-neon cyber-cut-sm transition-all">
+                    <i class="bi bi-postcard text-xl w-8 text-center drop-shadow-[0_0_5px_#00ff88]"></i>
+                    <span class="nav-label font-heading text-sm font-bold tracking-widest">TENTANG KAMI</span>
+                </a>
+
+                <a href="services.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-neon-blue transition-all">
+                    <i class="bi bi-gear text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_#00d4ff] group-hover:text-neon-blue"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">LAYANAN</span>
+                </a>
+
+                <a href="portfolio.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-neon-pink transition-all">
+                    <i class="bi bi-window-split text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_#ff00ff] group-hover:text-neon-pink"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">PORTOFOLIO</span>
+                </a>
+
+                <a href="blog.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-red-500/100 transition-all">
+                    <i class="bi bi-newspaper text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_FF0000] group-hover:text-red-500/100"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">BLOG</span>
+                </a>
+
+                <a href="contact.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-neon transition-all">
+                    <i class="bi bi-whatsapp text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_#00ff88] group-hover:text-neon"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">CONTACT</span>
+                </a>
+            </nav>
+
+            <div class="p-6 border-t border-border bg-panel shrink-0 overflow-hidden">
+                <div class="flex items-center gap-4 min-w-[200px]">
+                    <div class="w-8 h-8 rounded-full bg-border border border-neon flex items-center justify-center relative">
+                        <div class="absolute w-2 h-2 bg-neon rounded-full bottom-0 right-0 border border-black"></div>
+                        <i class="bi bi-person-fill text-neon"></i>
+                    </div>
+                    <div class="nav-label">
+                        <p class="text-[10px] text-gray-500 font-bold">OPERATOR_01</p>
+                        <p class="text-xs text-neon uppercase tracking-wider">ONLINE</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 relative h-full overflow-y-auto overflow-x-hidden bg-void bg-grid-pattern bg-[length:50px_50px]">
+            
+            <div class="md:hidden sticky top-0 z-40 bg-card/90 backdrop-blur border-b border-border p-4 flex justify-between items-center shadow-lg">
+                <div class="flex items-center gap-2">
+                    <i class="bi bi-cpu-fill text-neon"></i>
+                    <span class="font-heading font-bold text-white tracking-widest">LOGIC_ID</span>
+                </div>
+                <button onclick="toggleMobileSidebar()" class="text-neon text-2xl">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+
+            <section class="relative min-h-[60vh] flex flex-col justify-center px-6 lg:px-20 py-20 border-b border-border/50 bg-card overflow-hidden">
+                <div class="absolute inset-0 bg-circuit opacity-10"></div>
+                
+                <div class="z-10 max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                    
+                    <div class="lg:pr-10"> 
+                        <div class="inline-block px-3 py-1 border border-neon/30 bg-neon/5 text-neon text-xs font-mono cyber-cut-sm mb-6">
+                            <i class="bi bi-terminal mr-2"></i>AGENCY_PROFILE.EXE
+                        </div>
+                        
+                        <h1 class="font-heading text-4xl lg:text-7xl font-black text-white leading-[0.9] mb-6 uppercase tracking-tighter">
+                            SYSTEM <br>
+                            <span class="glitch inline-block text-white" data-text="ARCHITECTS">ARCHITECTS</span>
+                        </h1>
+
+                        <p class="text-gray-400 text-lg mb-8 leading-relaxed border-l-4 border-neon pl-6">
+                            LOGIC_ID bukan sekadar pengembang web. Kami adalah mitra strategis yang mengintegrasikan estetika brutal dengan kode yang efisien. Kami membangun ekosistem digital yang tangguh, aman, dan siap menghadapi masa depan.
+                        </p>
+
+                        <div class="grid grid-cols-3 gap-4 border-t border-border pt-6">
+                            <div>
+                                <h4 class="text-neon text-2xl font-heading font-bold">2024</h4>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-widest">ESTABLISHED</p>
+                            </div>
+                            <div>
+                                <h4 class="text-neon-blue text-2xl font-heading font-bold">50+</h4>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-widest">SYSTEMS DEPLOYED</p>
+                            </div>
+                            <div>
+                                <h4 class="text-neon-pink text-2xl font-heading font-bold">100%</h4>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-widest">SECURITY RATE</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative cyber-cut border border-border bg-void p-2 group w-full">
+                        <div class="absolute inset-0 bg-neon/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070" class="w-full h-80 lg:h-[450px] object-cover grayscale mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700">
+                        <div class="absolute top-4 left-4 flex gap-1">
+                            <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        </div>
+                        <div class="absolute bottom-4 right-4 bg-black/80 border border-neon p-2 text-right">
+                            <p class="text-xs text-neon font-mono">TEAM_LOGIC</p>
+                            <p class="text-[10px] text-gray-500 font-mono">STATUS: WORKING</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16 lg:py-24 px-6 lg:px-20 bg-void relative">
+                <div class="mb-12">
+                    <h2 class="font-heading text-3xl lg:text-4xl text-white mb-2 uppercase">System <span class="text-neon">Capabilities</span></h2>
+                    <p class="text-gray-500 text-sm font-mono">// WHY_CHOOSE_US</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-card border border-border p-6 cyber-cut-sm hover:border-neon transition-all group">
+                        <div class="w-12 h-12 bg-panel border border-border flex items-center justify-center mb-4 group-hover:bg-neon group-hover:text-black transition-colors">
+                            <i class="bi bi-lightning-charge text-2xl text-neon group-hover:text-black"></i>
+                        </div>
+                        <h3 class="font-heading text-lg text-white mb-2">High Velocity</h3>
+                        <p class="text-xs text-gray-500 font-mono leading-relaxed">
+                            Kode yang dioptimasi untuk kecepatan loading maksimal. Tidak ada bloatware.
+                        </p>
+                    </div>
+
+                    <div class="bg-card border border-border p-6 cyber-cut-sm hover:border-neon-blue transition-all group">
+                        <div class="w-12 h-12 bg-panel border border-border flex items-center justify-center mb-4 group-hover:bg-neon-blue group-hover:text-black transition-colors">
+                            <i class="bi bi-shield-check text-2xl text-neon-blue group-hover:text-black"></i>
+                        </div>
+                        <h3 class="font-heading text-lg text-white mb-2">Ironclad Security</h3>
+                        <p class="text-xs text-gray-500 font-mono leading-relaxed">
+                            Protokol keamanan berlapis. Enkripsi end-to-end standar industri.
+                        </p>
+                    </div>
+
+                    <div class="bg-card border border-border p-6 cyber-cut-sm hover:border-neon-pink transition-all group">
+                        <div class="w-12 h-12 bg-panel border border-border flex items-center justify-center mb-4 group-hover:bg-neon-pink group-hover:text-black transition-colors">
+                            <i class="bi bi-bezier2 text-2xl text-neon-pink group-hover:text-black"></i>
+                        </div>
+                        <h3 class="font-heading text-lg text-white mb-2">Scalable Architecture</h3>
+                        <p class="text-xs text-gray-500 font-mono leading-relaxed">
+                            Dibangun untuk berkembang. Siap menangani jutaan request pengguna.
+                        </p>
+                    </div>
+
+                    <div class="bg-card border border-border p-6 cyber-cut-sm hover:border-white transition-all group">
+                        <div class="w-12 h-12 bg-panel border border-border flex items-center justify-center mb-4 group-hover:bg-white group-hover:text-black transition-colors">
+                            <i class="bi bi-eye text-2xl text-white group-hover:text-black"></i>
+                        </div>
+                        <h3 class="font-heading text-lg text-white mb-2">Brutalist Aesthetics</h3>
+                        <p class="text-xs text-gray-500 font-mono leading-relaxed">
+                            Desain yang berani, fungsional, dan meninggalkan kesan mendalam.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16 lg:py-24 px-6 lg:px-20 bg-card border-y border-border">
+                <div class="max-w-3xl mx-auto">
+                    <div class="mb-12 text-center">
+                        <h2 class="font-heading text-3xl lg:text-4xl text-white mb-2 uppercase">Knowledge <span class="text-gray-500">Base</span></h2>
+                        <p class="text-gray-500 text-sm font-mono">// FREQUENTLY_ASKED_QUESTIONS</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <details class="group bg-void border border-border cyber-cut-sm overflow-hidden">
+                            <summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-panel transition-colors text-white font-heading font-bold select-none">
+                                <span class="flex items-center gap-3"><span class="text-neon">[?]</span> Apakah LOGIC_ID menerima custom coding?</span>
+                                <i class="bi bi-chevron-down transition-transform group-open:rotate-180 text-gray-500"></i>
+                            </summary>
+                            <div class="px-6 pb-6 pt-2 border-t border-border/50 text-gray-400 font-mono text-sm leading-relaxed">
+                                <span class="text-neon">>></span> Tentu. Kami tidak menggunakan template murahan. Setiap baris kode ditulis khusus (tailor-made) sesuai kebutuhan spesifik bisnis Anda untuk memastikan performa dan keunikan maksimal.
+                            </div>
+                        </details>
+
+                        <details class="group bg-void border border-border cyber-cut-sm overflow-hidden">
+                            <summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-panel transition-colors text-white font-heading font-bold select-none">
+                                <span class="flex items-center gap-3"><span class="text-neon-blue">[?]</span> Berapa lama estimasi pengerjaan proyek?</span>
+                                <i class="bi bi-chevron-down transition-transform group-open:rotate-180 text-gray-500"></i>
+                            </summary>
+                            <div class="px-6 pb-6 pt-2 border-t border-border/50 text-gray-400 font-mono text-sm leading-relaxed">
+                                <span class="text-neon-blue">>></span> Tergantung kompleksitas. Landing page standar memakan waktu 1-2 minggu. Sistem web kompleks atau aplikasi mobile bisa memakan waktu 1-3 bulan. Kami memprioritaskan kualitas daripada kecepatan yang ceroboh.
+                            </div>
+                        </details>
+
+                        <details class="group bg-void border border-border cyber-cut-sm overflow-hidden">
+                            <summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-panel transition-colors text-white font-heading font-bold select-none">
+                                <span class="flex items-center gap-3"><span class="text-neon-pink">[?]</span> Apakah ada garansi maintenance?</span>
+                                <i class="bi bi-chevron-down transition-transform group-open:rotate-180 text-gray-500"></i>
+                            </summary>
+                            <div class="px-6 pb-6 pt-2 border-t border-border/50 text-gray-400 font-mono text-sm leading-relaxed">
+                                <span class="text-neon-pink">>></span> Ya. Setiap paket deployment mencakup garansi bug fix selama 3 bulan dan dukungan teknis prioritas. Kami juga menawarkan paket maintenance jangka panjang untuk update keamanan berkala.
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cta" class="py-24 px-6 relative bg-panel overflow-hidden border-b border-border">
+                <div class="relative z-10 max-w-5xl mx-auto">
+                    <div class="border border-border bg-void/50 cyber-cut p-1 lg:p-2">
+                        <div class="bg-card border border-border p-8 lg:p-12 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-neon/5 to-transparent h-full w-full animate-scan pointer-events-none"></div>
+                            
+                            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                <div class="text-left max-w-xl">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-3 h-3 bg-neon rounded-full animate-pulse"></div>
+                                        <span class="text-neon font-mono text-xs tracking-widest">SECURE_UPLINK_READY</span>
+                                    </div>
+                                    <h2 class="font-heading text-3xl lg:text-5xl text-white mb-4 uppercase leading-tight">
+                                        Ready to <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon to-neon-blue">Upgrade?</span>
+                                    </h2>
+                                    <p class="text-gray-400 font-mono text-sm lg:text-base leading-relaxed">
+                                        Jangan biarkan kompetitor mengambil alih jaringan. Mulai transformasi digital Anda sekarang dengan infrastruktur Logic_ID.
+                                    </p>
+                                </div>
+
+                                <div class="flex-shrink-0">
+                                    <button class="relative group overflow-hidden px-8 py-6 bg-neon text-black font-heading font-bold text-xl uppercase tracking-widest cyber-cut hover:bg-white transition-colors duration-300 shadow-[0_0_20px_rgba(0,255,136,0.3)]">
+                                        <span class="relative z-10 flex items-center gap-3">
+                                            ESTABLISH_CONNECTION <i class="bi bi-arrow-right-short text-2xl"></i>
+                                        </span>
+                                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 pt-6 border-t border-border/50 flex justify-between text-[10px] text-gray-500 font-mono uppercase tracking-wider">
+                                <span>Encrypted: AES-256</span>
+                                <span>Latency: 2ms</span>
+                                <span>Port: OPEN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="bg-panel border-t border-border pt-16 pb-8 px-6 lg:px-20 relative overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 relative z-10">
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="flex items-center gap-2 mb-6">
+                            <i class="bi bi-cpu-fill text-neon text-2xl"></i>
+                            <span class="font-heading font-bold text-white text-2xl tracking-widest">LOGIC_ID</span>
+                        </div>
+                        <p class="text-gray-500 text-sm font-mono max-w-sm mb-6">
+                            Logic_ID Systems Integrated.<br>
+                            Membangun ekosistem digital yang aman, cepat, dan skalabel untuk entitas masa depan.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-linkedin"></i></a>
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <h4 class="text-white font-heading font-bold mb-6 uppercase border-l-2 border-neon pl-3">Navigation</h4>
+                        <ul class="space-y-3 text-sm text-gray-500 font-mono">
+                            <li><a href="index.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Dashboard</a></li>
+                            <li><a href="about.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> System Info</a></li>
+                            <li><a href="services.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Modules</a></li>
+                            <li><a href="portfolio.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Database</a></li>
+                        </ul>
+                    </div>
+                    <div class="hidden md:block">
+                        <h4 class="text-white font-heading font-bold mb-6 uppercase border-l-2 border-neon-pink pl-3">Legal</h4>
+                        <ul class="space-y-3 text-sm text-gray-500 font-mono">
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Privacy Protocol</a></li>
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Terms of Service</a></li>
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Disclaimer</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-border/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 font-mono relative z-10">
+                    <p>&copy; 2026 LOGIC_ID SYSTEMS. ALL RIGHTS RESERVED.</p>
+                    <p>STATUS: <span class="text-neon animate-pulse">ONLINE</span> // SERVER: ID_JKT_01</p>
+                </div>
+
+                <div class="absolute bottom-0 right-0 w-64 h-64 bg-neon/5 blur-[80px] pointer-events-none"></div>
+            </footer>
+
+        </main>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-[40] flex flex-col gap-4">
+        <button id="scrollTopBtn" onclick="scrollToTop()" class="w-12 h-12 bg-card border border-neon text-neon flex items-center justify-center shadow-[0_0_15px_#00ff8850] hover:bg-neon hover:text-black transition-all translate-y-20 opacity-0 cyber-cut-sm">
+            <i class="bi bi-arrow-up text-2xl font-bold"></i>
+        </button>
+        <a href="https://wa.me/628123456789" target="_blank" class="w-12 h-12 bg-[#25D366] text-white flex items-center justify-center shadow-[0_0_15px_#25D36680] hover:scale-110 transition-transform cyber-cut-sm border border-white/20">
+            <i class="bi bi-whatsapp text-2xl"></i>
+        </a>
+    </div>
+
+    <div id="mobile-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/80 z-[90] hidden lg:hidden backdrop-blur-sm transition-opacity"></div>
+
+    <script>
+        // === JS LOGIC (100% SAME AS INDEX.HTML) ===
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('toggle-icon');
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            
+            if (isCollapsed) {
+                sidebar.style.setProperty('--sidebar-width', 'var(--sidebar-collapsed-width)');
+                icon.className = 'bi bi-chevron-right';
+            } else {
+                sidebar.style.setProperty('--sidebar-width', '280px');
+                icon.className = 'bi bi-chevron-left';
+            }
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('mobile-active');
+            if (sidebar.classList.contains('mobile-active')) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        const mainContent = document.querySelector('main');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+        mainContent.addEventListener('scroll', () => {
+            if (mainContent.scrollTop > 300) {
+                scrollTopBtn.classList.remove('translate-y-20', 'opacity-0');
+            } else {
+                scrollTopBtn.classList.add('translate-y-20', 'opacity-0');
+            }
+        });
+
+        function scrollToTop() {
+            mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

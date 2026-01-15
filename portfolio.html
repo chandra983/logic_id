@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIC_ID // PROJECT_DATABASE</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#030305',
+                        card: '#0a0a0f',
+                        panel: '#12121a',
+                        neon: '#00ff88',
+                        'neon-dim': 'rgba(0, 255, 136, 0.05)',
+                        'neon-pink': '#ff00ff',
+                        'neon-blue': '#00d4ff',
+                        border: '#2a2a3a',
+                    },
+                    fontFamily: {
+                        heading: ['Orbitron', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px)",
+                        'circuit': "url('https://www.transparenttextures.com/patterns/circuit-board.png')",
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scan': 'scan 3s linear infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CORE VARIABLES */
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        body { background-color: #030305; color: #e0e0e0; }
+
+        /* VISUAL FX */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.2) 2px, rgba(0, 0, 0, 0.2) 4px);
+            pointer-events: none; z-index: 40;
+        }
+
+        .cyber-cut { clip-path: polygon(0 15px, 15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%); }
+        .cyber-cut-sm { clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%); }
+        .cyber-cut-tr { clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%); }
+
+        /* GLITCH TEXT */
+        .glitch-wrapper { position: relative; display: inline-block; }
+        .glitch { position: relative; color: white; mix-blend-mode: lighten; }
+        .glitch::before, .glitch::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #030305;
+        }
+        .glitch::before { text-shadow: -2px 0 #ff00ff; clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); transform: translate(-4px, 0); animation: glitch-tear-1 3s infinite linear alternate-reverse; }
+        .glitch::after { text-shadow: 2px 0 #00ff88; clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); transform: translate(4px, 0); animation: glitch-tear-2 2.5s infinite linear alternate-reverse; }
+        
+        @keyframes glitch-tear-1 {
+            0% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(-5px, 1px); }
+            100% { clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%); transform: translate(3px, -2px); }
+        }
+        @keyframes glitch-tear-2 {
+            0% { clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%); transform: translate(5px, -1px); }
+            100% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(-3px, 2px); }
+        }
+
+        /* SIDEBAR TRANSITION */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: var(--sidebar-width); flex-shrink: 0; }
+        .nav-label { transition: opacity 0.2s ease; white-space: nowrap; }
+        .collapsed .nav-label { opacity: 0; visibility: hidden; pointer-events: none; position: absolute; }
+        .collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
+        .collapsed nav a i { margin-right: 0; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030305; }
+        ::-webkit-scrollbar-thumb { background: #2a2a3a; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff00ff; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+        /* PROJECT FADE ANIMATION */
+        .project-card { transition: all 0.4s ease-in-out; }
+        .project-card.hidden { display: none; }
+        .project-card.visible { display: block; animation: fadeUp 0.5s ease-out forwards; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* MOBILE SIDEBAR */
+        @media (max-width: 768px) {
+            #sidebar { 
+                position: fixed; height: 100%; z-index: 100; transform: translateX(-100%); 
+                transition: transform 0.3s ease; width: 280px !important; 
+            }
+            #sidebar.mobile-active { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="font-mono overflow-hidden bg-void selection:bg-neon-pink selection:text-void">
+    <div class="scanlines"></div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside id="sidebar" class="relative z-[60] h-full bg-card border-r border-border flex flex-col shadow-[5px_0_15px_rgba(0,0,0,0.5)]">
+            <div class="h-20 flex items-center px-6 border-b border-border overflow-hidden shrink-0">
+                <div class="flex items-center gap-4 min-w-[200px]">
+                    <div class="w-10 h-10 bg-neon flex items-center justify-center cyber-cut-sm shadow-[0_0_10px_#00ff88]">
+                        <i class="bi bi-cpu-fill text-void text-xl"></i>
+                    </div>
+                    <span class="nav-label font-heading font-black text-xl tracking-tighter text-white">LOGIC<span class="text-neon">_ID</span></span>
+                </div>
+            </div>
+
+            <button onclick="toggleSidebar()" class="hidden md:flex absolute -right-3 top-24 w-6 h-12 bg-card border border-border text-neon items-center justify-center hover:bg-neon hover:text-void transition-all z-50 cyber-cut-sm">
+                <i id="toggle-icon" class="bi bi-chevron-left text-xs"></i>
+            </button>
+
+            <nav class="flex-1 py-10 px-4 space-y-2 overflow-y-auto scrollbar-hide">
+                <a href="index.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-white transition-all mb-4">
+                    <i class="bi bi-grid-1x2-fill text-xl w-8 text-center group-hover:text-white"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">BERANDA</span>
+                </a>
+                
+                <a href="about.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-white transition-all">
+                    <i class="bi bi-postcard text-xl w-8 text-center group-hover:text-white"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">TENTANG KAMI</span>
+                </a>
+
+                <a href="services.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-neon-blue transition-all">
+                    <i class="bi bi-gear text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_#00d4ff] group-hover:text-neon-blue"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">LAYANAN</span>
+                </a>
+
+                <a href="portfolio.html" class="group flex items-center gap-5 p-3 text-neon-pink bg-neon-pink/5 border-r-4 border-neon-pink cyber-cut-sm transition-all">
+                    <i class="bi bi-window-split text-xl w-8 text-center drop-shadow-[0_0_5px_#ff00ff]"></i>
+                    <span class="nav-label font-heading text-sm font-bold tracking-widest">PORTOFOLIO</span>
+                </a>
+
+                <a href="blog.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-red-500/100 transition-all">
+                    <i class="bi bi-newspaper text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_FF0000] group-hover:text-red-500/100"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">BLOG</span>
+                </a>
+
+                <a href="contact.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-neon transition-all">
+                    <i class="bi bi-whatsapp text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_#00ff88] group-hover:text-neon"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">CONTACT</span>
+                </a>
+            </nav>
+
+            <div class="p-6 border-t border-border bg-panel shrink-0 overflow-hidden">
+                <div class="flex items-center gap-4 min-w-[200px]">
+                    <div class="w-8 h-8 rounded-full bg-border border border-neon flex items-center justify-center relative">
+                        <div class="absolute w-2 h-2 bg-neon rounded-full bottom-0 right-0 border border-black"></div>
+                        <i class="bi bi-person-fill text-neon"></i>
+                    </div>
+                    <div class="nav-label">
+                        <p class="text-[10px] text-gray-500 font-bold">OPERATOR_01</p>
+                        <p class="text-xs text-neon uppercase tracking-wider">ONLINE</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 relative h-full overflow-y-auto overflow-x-hidden bg-void bg-grid-pattern bg-[length:50px_50px]">
+            
+            <div class="md:hidden sticky top-0 z-40 bg-card/90 backdrop-blur border-b border-border p-4 flex justify-between items-center shadow-lg">
+                <div class="flex items-center gap-2">
+                    <i class="bi bi-cpu-fill text-neon"></i>
+                    <span class="font-heading font-bold text-white tracking-widest">LOGIC_ID</span>
+                </div>
+                <button onclick="toggleMobileSidebar()" class="text-neon text-2xl">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+
+            <section class="relative min-h-[50vh] flex flex-col justify-center px-6 lg:px-20 py-20 border-b border-border/50 bg-card overflow-hidden">
+                <div class="absolute inset-0 bg-circuit opacity-10"></div>
+                <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-neon-pink/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div class="z-10 max-w-6xl w-full">
+                    <div class="inline-block px-3 py-1 border border-neon-pink/30 bg-neon-pink/5 text-neon-pink text-xs font-mono cyber-cut-sm mb-6">
+                        <i class="bi bi-database-check mr-2"></i>DATABASE_ACCESS
+                    </div>
+                    
+                    <h1 class="font-heading text-4xl lg:text-7xl font-black text-white leading-[0.9] mb-6 uppercase tracking-tighter">
+                        MISSION <br>
+                        <span class="glitch inline-block text-white" data-text="ARCHIVES">ARCHIVES</span>
+                    </h1>
+                    
+                    <p class="text-gray-400 text-lg max-w-2xl leading-relaxed border-l-4 border-neon-pink pl-6">
+                        Kumpulan studi kasus dan deployment sukses. Bukti nyata keunggulan infrastruktur digital yang kami bangun.
+                    </p>
+                </div>
+            </section>
+
+            <section class="py-16 lg:py-24 px-6 lg:px-20 bg-void relative">
+                
+                <div class="flex flex-wrap gap-4 mb-12">
+                    <button onclick="filterProjects('all')" class="filter-btn active px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-white data-[active=true]:bg-white data-[active=true]:text-black data-[active=true]:border-white text-gray-500" data-active="true">
+                        SEMUA
+                    </button>
+                    <button onclick="filterProjects('web')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon-blue/50 data-[active=true]:bg-neon-blue data-[active=true]:text-black data-[active=true]:border-neon-blue text-gray-500">
+                        WEBSITE
+                    </button>
+                    <button onclick="filterProjects('app')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon-pink/50 data-[active=true]:bg-neon-pink data-[active=true]:text-black data-[active=true]:border-neon-pink text-gray-500">
+                        MOBILE APPS
+                    </button>
+                    <button onclick="filterProjects('marketing')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon/50 data-[active=true]:bg-neon data-[active=true]:text-black data-[active=true]:border-neon text-gray-500">
+                        MARKETING
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-grid">
+                    
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-blue transition-all duration-300" data-category="web">
+                        <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
+                            <div class="absolute inset-0 bg-neon-blue/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-blue text-neon-blue text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Deployed</div>
+                        </div>
+                        <div class="p-6 relative">
+                            <p class="text-neon-blue font-mono text-xs mb-2 tracking-widest">> E-COMMERCE</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-blue transition-colors">Neo_Marketplace</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Platform belanja dengan sistem inventory real-time dan payment gateway terintegrasi.</p>
+                            <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon-blue hover:text-black hover:border-neon-blue transition-all cyber-cut-sm">
+                                VIEW DETAIL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-blue transition-all duration-300" data-category="web">
+                        <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
+                            <div class="absolute inset-0 bg-neon-blue/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-blue text-neon-blue text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Deployed</div>
+                        </div>
+                        <div class="p-6 relative">
+                            <p class="text-neon-blue font-mono text-xs mb-2 tracking-widest">> FINTECH_WEB</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-blue transition-colors">Core_Finance</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Dashboard keuangan korporat dengan visualisasi data kompleks dan keamanan tinggi.</p>
+                            <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon-blue hover:text-black hover:border-neon-blue transition-all cyber-cut-sm">
+                                VIEW DETAIL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-pink transition-all duration-300" data-category="app">
+                        <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
+                            <div class="absolute inset-0 bg-neon-pink/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-pink text-neon-pink text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Active</div>
+                        </div>
+                        <div class="p-6 relative">
+                            <p class="text-neon-pink font-mono text-xs mb-2 tracking-widest">> MOBILE_HEALTH</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-pink transition-colors">Vital_Track</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Aplikasi monitoring kesehatan dengan integrasi IoT wearables.</p>
+                            <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon-pink hover:text-black hover:border-neon-pink transition-all cyber-cut-sm">
+                                VIEW DETAIL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-pink transition-all duration-300" data-category="app">
+                        <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
+                            <div class="absolute inset-0 bg-neon-pink/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <img src="https://images.unsplash.com/photo-1555421689-491a97ff2040?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-pink text-neon-pink text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Active</div>
+                        </div>
+                        <div class="p-6 relative">
+                            <p class="text-neon-pink font-mono text-xs mb-2 tracking-widest">> LOGISTICS</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-pink transition-colors">Swift_Cargo</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Sistem tracking pengiriman barang real-time dengan optimasi rute AI.</p>
+                            <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon-pink hover:text-black hover:border-neon-pink transition-all cyber-cut-sm">
+                                VIEW DETAIL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon transition-all duration-300" data-category="marketing">
+                        <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
+                            <div class="absolute inset-0 bg-neon/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <img src="https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?q=80&w=2074" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon text-neon text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Done</div>
+                        </div>
+                        <div class="p-6 relative">
+                            <p class="text-neon font-mono text-xs mb-2 tracking-widest">> SEO_CAMPAIGN</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon transition-colors">Global_Reach</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Peningkatan traffic organik sebesar 300% dalam 6 bulan untuk klien internasional.</p>
+                            <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon hover:text-black hover:border-neon transition-all cyber-cut-sm">
+                                VIEW DETAIL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon transition-all duration-300" data-category="marketing">
+                        <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
+                            <div class="absolute inset-0 bg-neon/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?q=80&w=2031" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon text-neon text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Done</div>
+                        </div>
+                        <div class="p-6 relative">
+                            <p class="text-neon font-mono text-xs mb-2 tracking-widest">> SOCIAL_ADS</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon transition-colors">Viral_Boost</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Kampanye iklan media sosial terarah dengan ROAS (Return on Ad Spend) 5x lipat.</p>
+                            <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon hover:text-black hover:border-neon transition-all cyber-cut-sm">
+                                VIEW DETAIL
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="py-12 border-y border-border bg-card/50 overflow-hidden">
+                <div class="mb-8 text-center">
+                    <p class="text-gray-500 text-xs font-mono tracking-[0.3em] uppercase">Trusted By Major Systems</p>
+                </div>
+                <div class="relative w-full overflow-hidden">
+                    <div class="flex animate-marquee gap-24 whitespace-nowrap min-w-full items-center">
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">CYBER_DYNAMICS</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">NEXUS_CORE_LTD</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">OMEGA_FINANCE</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">VERTEX_GLOBAL</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">SYNTH_LABS</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">QUANTUM_SOFT</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">CYBER_DYNAMICS</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">NEXUS_CORE_LTD</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">OMEGA_FINANCE</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">VERTEX_GLOBAL</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">SYNTH_LABS</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">QUANTUM_SOFT</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cta" class="py-24 px-6 relative bg-panel overflow-hidden border-b border-border">
+                <div class="relative z-10 max-w-5xl mx-auto">
+                    <div class="border border-border bg-void/50 cyber-cut p-1 lg:p-2">
+                        <div class="bg-card border border-border p-8 lg:p-12 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-neon-pink/5 to-transparent h-full w-full animate-scan pointer-events-none"></div>
+                            
+                            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                <div class="text-left max-w-xl">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-3 h-3 bg-neon-pink rounded-full animate-pulse"></div>
+                                        <span class="text-neon-pink font-mono text-xs tracking-widest">SYSTEM_UPLINK</span>
+                                    </div>
+                                    <h2 class="font-heading text-3xl lg:text-5xl text-white mb-4 uppercase leading-tight">
+                                        Build Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-blue">Legacy</span>
+                                    </h2>
+                                    <p class="text-gray-400 font-mono text-sm lg:text-base leading-relaxed">
+                                        Lihat apa yang bisa kami bangun untuk Anda. Konsultasikan kebutuhan proyek Anda sekarang.
+                                    </p>
+                                </div>
+
+                                <div class="flex-shrink-0">
+                                    <a href="https://wa.me/628123456789?text=Halo%20Logic_ID%2C%20saya%20ingin%20diskusi%20project%20baru." target="_blank" class="relative group overflow-hidden px-8 py-6 bg-neon-pink text-black font-heading font-bold text-xl uppercase tracking-widest cyber-cut hover:bg-white transition-colors duration-300 shadow-[0_0_20px_rgba(255,0,255,0.3)] inline-block text-center">
+                                        <span class="relative z-10 flex items-center gap-3">
+                                            CHAT_WHATSAPP <i class="bi bi-whatsapp text-2xl"></i>
+                                        </span>
+                                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="bg-panel border-t border-border pt-16 pb-8 px-6 lg:px-20 relative overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 relative z-10">
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="flex items-center gap-2 mb-6">
+                            <i class="bi bi-cpu-fill text-neon text-2xl"></i>
+                            <span class="font-heading font-bold text-white text-2xl tracking-widest">LOGIC_ID</span>
+                        </div>
+                        <p class="text-gray-500 text-sm font-mono max-w-sm mb-6">
+                            Logic_ID Systems Integrated.<br>
+                            Membangun ekosistem digital yang aman, cepat, dan skalabel untuk entitas masa depan.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-linkedin"></i></a>
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <h4 class="text-white font-heading font-bold mb-6 uppercase border-l-2 border-neon pl-3">Navigation</h4>
+                        <ul class="space-y-3 text-sm text-gray-500 font-mono">
+                            <li><a href="index.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Dashboard</a></li>
+                            <li><a href="about.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> System Info</a></li>
+                            <li><a href="services.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Modules</a></li>
+                            <li><a href="portfolio.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Database</a></li>
+                        </ul>
+                    </div>
+                    <div class="hidden md:block">
+                        <h4 class="text-white font-heading font-bold mb-6 uppercase border-l-2 border-neon-pink pl-3">Legal</h4>
+                        <ul class="space-y-3 text-sm text-gray-500 font-mono">
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Privacy Protocol</a></li>
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Terms of Service</a></li>
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Disclaimer</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-border/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 font-mono relative z-10">
+                    <p>&copy; 2026 LOGIC_ID SYSTEMS. ALL RIGHTS RESERVED.</p>
+                    <p>STATUS: <span class="text-neon animate-pulse">ONLINE</span> // SERVER: ID_JKT_01</p>
+                </div>
+
+                <div class="absolute bottom-0 right-0 w-64 h-64 bg-neon/5 blur-[80px] pointer-events-none"></div>
+            </footer>
+
+        </main>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-[40] flex flex-col gap-4">
+        <button id="scrollTopBtn" onclick="scrollToTop()" class="w-12 h-12 bg-card border border-neon text-neon flex items-center justify-center shadow-[0_0_15px_#00ff8850] hover:bg-neon hover:text-black transition-all translate-y-20 opacity-0 cyber-cut-sm">
+            <i class="bi bi-arrow-up text-2xl font-bold"></i>
+        </button>
+        <a href="https://wa.me/628123456789" target="_blank" class="w-12 h-12 bg-[#25D366] text-white flex items-center justify-center shadow-[0_0_15px_#25D36680] hover:scale-110 transition-transform cyber-cut-sm border border-white/20">
+            <i class="bi bi-whatsapp text-2xl"></i>
+        </a>
+    </div>
+
+    <div id="mobile-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/80 z-[90] hidden lg:hidden backdrop-blur-sm transition-opacity"></div>
+
+    <script>
+        // === FILTER LOGIC ===
+        function filterProjects(category) {
+            // Update Active Button
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.removeAttribute('data-active');
+                btn.classList.add('text-gray-500');
+            });
+            const activeBtn = document.querySelector(`button[onclick="filterProjects('${category}')"]`);
+            activeBtn.setAttribute('data-active', 'true');
+            activeBtn.classList.remove('text-gray-500');
+
+            // Filter Grid Items
+            const items = document.querySelectorAll('.project-card');
+            items.forEach(item => {
+                // Reset Animation
+                item.classList.remove('visible');
+                void item.offsetWidth; // trigger reflow
+
+                if (category === 'all' || item.dataset.category === category) {
+                    item.classList.remove('hidden');
+                    item.classList.add('visible');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        // Initialize Filter
+        document.addEventListener('DOMContentLoaded', () => {
+            filterProjects('all');
+        });
+
+        // === SIDEBAR LOGIC (100% SAME AS INDEX.HTML) ===
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('toggle-icon');
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            
+            if (isCollapsed) {
+                sidebar.style.setProperty('--sidebar-width', 'var(--sidebar-collapsed-width)');
+                icon.className = 'bi bi-chevron-right';
+            } else {
+                sidebar.style.setProperty('--sidebar-width', '280px');
+                icon.className = 'bi bi-chevron-left';
+            }
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('mobile-active');
+            if (sidebar.classList.contains('mobile-active')) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        const mainContent = document.querySelector('main');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+        mainContent.addEventListener('scroll', () => {
+            if (mainContent.scrollTop > 300) {
+                scrollTopBtn.classList.remove('translate-y-20', 'opacity-0');
+            } else {
+                scrollTopBtn.classList.add('translate-y-20', 'opacity-0');
+            }
+        });
+
+        function scrollToTop() {
+            mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

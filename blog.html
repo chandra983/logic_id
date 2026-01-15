@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIC_ID // SYSTEM_LOGS</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#030305',
+                        card: '#0a0a0f',
+                        panel: '#12121a',
+                        neon: '#00ff88',
+                        'neon-dim': 'rgba(0, 255, 136, 0.05)',
+                        'neon-pink': '#ff00ff',
+                        'neon-blue': '#00d4ff',
+                        'neon-red': '#ff2a2a', // Warna Khusus Blog
+                        border: '#2a2a3a',
+                    },
+                    fontFamily: {
+                        heading: ['Orbitron', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px)",
+                        'circuit': "url('https://www.transparenttextures.com/patterns/circuit-board.png')",
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scan': 'scan 3s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CORE VARIABLES */
+        :root {
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+        }
+
+        body { background-color: #030305; color: #e0e0e0; }
+
+        /* VISUAL FX */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.2) 2px, rgba(0, 0, 0, 0.2) 4px);
+            pointer-events: none; z-index: 40;
+        }
+
+        .cyber-cut { clip-path: polygon(0 15px, 15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%); }
+        .cyber-cut-sm { clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%); }
+        
+        /* GLITCH TEXT */
+        .glitch-wrapper { position: relative; display: inline-block; }
+        .glitch { position: relative; color: white; mix-blend-mode: lighten; }
+        .glitch::before, .glitch::after {
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #030305;
+        }
+        .glitch::before { text-shadow: -2px 0 #ff2a2a; clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); transform: translate(-4px, 0); animation: glitch-tear-1 3s infinite linear alternate-reverse; }
+        .glitch::after { text-shadow: 2px 0 #ffffff; clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); transform: translate(4px, 0); animation: glitch-tear-2 2.5s infinite linear alternate-reverse; }
+        
+        @keyframes glitch-tear-1 {
+            0% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(-5px, 1px); }
+            100% { clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%); transform: translate(3px, -2px); }
+        }
+        @keyframes glitch-tear-2 {
+            0% { clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%); transform: translate(5px, -1px); }
+            100% { clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); transform: translate(-3px, 2px); }
+        }
+
+        /* SIDEBAR TRANSITION */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: var(--sidebar-width); flex-shrink: 0; }
+        .nav-label { transition: opacity 0.2s ease; white-space: nowrap; }
+        .collapsed .nav-label { opacity: 0; visibility: hidden; pointer-events: none; position: absolute; }
+        .collapsed nav a { justify-content: center; padding-left: 0; padding-right: 0; }
+        .collapsed nav a i { margin-right: 0; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #030305; }
+        ::-webkit-scrollbar-thumb { background: #2a2a3a; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff2a2a; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+
+        /* SEARCH INPUT */
+        .search-input:focus { box-shadow: 0 0 15px rgba(255, 42, 42, 0.3); border-color: #ff2a2a; }
+
+        /* PAGINATION DISABLED */
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #2a2a3a; color: #555; }
+
+        /* MOBILE SIDEBAR */
+        @media (max-width: 768px) {
+            #sidebar { 
+                position: fixed; height: 100%; z-index: 100; transform: translateX(-100%); 
+                transition: transform 0.3s ease; width: 280px !important; 
+            }
+            #sidebar.mobile-active { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="font-mono overflow-hidden bg-void selection:bg-neon-red selection:text-white">
+    <div class="scanlines"></div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside id="sidebar" class="relative z-[60] h-full bg-card border-r border-border flex flex-col shadow-[5px_0_15px_rgba(0,0,0,0.5)]">
+            <div class="h-20 flex items-center px-6 border-b border-border overflow-hidden shrink-0">
+                <div class="flex items-center gap-4 min-w-[200px]">
+                    <div class="w-10 h-10 bg-neon flex items-center justify-center cyber-cut-sm shadow-[0_0_10px_#00ff88]">
+                        <i class="bi bi-cpu-fill text-void text-xl"></i>
+                    </div>
+                    <span class="nav-label font-heading font-black text-xl tracking-tighter text-white">LOGIC<span class="text-neon">_ID</span></span>
+                </div>
+            </div>
+
+            <button onclick="toggleSidebar()" class="hidden md:flex absolute -right-3 top-24 w-6 h-12 bg-card border border-border text-neon items-center justify-center hover:bg-neon hover:text-void transition-all z-50 cyber-cut-sm">
+                <i id="toggle-icon" class="bi bi-chevron-left text-xs"></i>
+            </button>
+
+            <nav class="flex-1 py-10 px-4 space-y-2 overflow-y-auto scrollbar-hide">
+                <a href="index.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-white transition-all mb-4">
+                    <i class="bi bi-grid-1x2-fill text-xl w-8 text-center group-hover:text-white"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">BERANDA</span>
+                </a>
+                
+                <a href="about.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-white transition-all">
+                    <i class="bi bi-postcard text-xl w-8 text-center group-hover:text-white"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">TENTANG KAMI</span>
+                </a>
+
+                <a href="services.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-neon-blue transition-all">
+                    <i class="bi bi-gear text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_#00d4ff] group-hover:text-neon-blue"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">LAYANAN</span>
+                </a>
+
+                <a href="portfolio.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-neon-pink transition-all">
+                    <i class="bi bi-window-split text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_#ff00ff] group-hover:text-neon-pink"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">PORTOFOLIO</span>
+                </a>
+
+                <a href="blog.html" class="group flex items-center gap-5 p-3 text-neon-red bg-neon-red/5 border-r-4 border-neon-red cyber-cut-sm transition-all">
+                    <i class="bi bi-newspaper text-xl w-8 text-center drop-shadow-[0_0_5px_#ff2a2a]"></i>
+                    <span class="nav-label font-heading text-sm font-bold tracking-widest">BLOG</span>
+                </a>
+
+                <a href="contact.html" class="group flex items-center gap-5 p-3 text-gray-400 hover:text-white hover:bg-panel border-r-4 border-transparent hover:border-neon transition-all">
+                    <i class="bi bi-whatsapp text-xl w-8 text-center group-hover:drop-shadow-[0_0_8px_#00ff88] group-hover:text-neon"></i>
+                    <span class="nav-label font-heading text-sm tracking-widest">CONTACT</span>
+                </a>
+            </nav>
+
+            <div class="p-6 border-t border-border bg-panel shrink-0 overflow-hidden">
+                <div class="flex items-center gap-4 min-w-[200px]">
+                    <div class="w-8 h-8 rounded-full bg-border border border-neon flex items-center justify-center relative">
+                        <div class="absolute w-2 h-2 bg-neon rounded-full bottom-0 right-0 border border-black"></div>
+                        <i class="bi bi-person-fill text-neon"></i>
+                    </div>
+                    <div class="nav-label">
+                        <p class="text-[10px] text-gray-500 font-bold">OPERATOR_01</p>
+                        <p class="text-xs text-neon uppercase tracking-wider">ONLINE</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 relative h-full overflow-y-auto overflow-x-hidden bg-void bg-grid-pattern bg-[length:50px_50px]">
+            
+            <div class="md:hidden sticky top-0 z-40 bg-card/90 backdrop-blur border-b border-border p-4 flex justify-between items-center shadow-lg">
+                <div class="flex items-center gap-2">
+                    <i class="bi bi-cpu-fill text-neon"></i>
+                    <span class="font-heading font-bold text-white tracking-widest">LOGIC_ID</span>
+                </div>
+                <button onclick="toggleMobileSidebar()" class="text-neon text-2xl">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+
+            <section class="relative min-h-[40vh] flex flex-col justify-center px-6 lg:px-20 py-20 border-b border-border/50 bg-card overflow-hidden">
+                <div class="absolute inset-0 bg-circuit opacity-10"></div>
+                <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-neon-red/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div class="z-10 max-w-6xl w-full">
+                    <div class="inline-block px-3 py-1 border border-neon-red/30 bg-neon-red/5 text-neon-red text-xs font-mono cyber-cut-sm mb-6">
+                        <i class="bi bi-journal-code mr-2"></i>SYS_LOGS.DAT
+                    </div>
+                    
+                    <h1 class="font-heading text-4xl lg:text-7xl font-black text-white leading-[0.9] mb-6 uppercase tracking-tighter">
+                        SYSTEM <br>
+                        <span class="glitch inline-block text-white" data-text="FRAGMENTS">FRAGMENTS</span>
+                    </h1>
+                    
+                    <p class="text-gray-400 text-lg max-w-2xl leading-relaxed border-l-4 border-neon-red pl-6">
+                        Wawasan, pembaruan teknologi, dan analisis mendalam tentang infrastruktur digital masa depan.
+                    </p>
+                </div>
+            </section>
+
+            <section class="py-16 lg:py-24 px-6 lg:px-20 bg-void relative">
+                
+                <div class="w-full max-w-2xl ml-auto mb-16 relative z-10">
+                    <div class="relative group">
+                        <input type="text" id="searchInput" placeholder="SEARCH_DATABASE..." class="search-input w-full bg-card border border-border text-white px-6 py-4 font-mono uppercase tracking-wider outline-none transition-all cyber-cut-sm pr-16 placeholder-gray-600">
+                        <div class="absolute right-0 top-0 h-full w-16 flex items-center justify-center text-neon-red pointer-events-none border-l border-border bg-panel cyber-cut-sm">
+                            <i class="bi bi-search text-xl"></i>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-2 font-mono text-right" id="searchStats">INDEXING 12 FILES...</p>
+                </div>
+
+                <div id="blog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                    </div>
+
+                <div class="flex justify-between items-center border-t border-border pt-8" id="pagination">
+                    <button id="prevBtn" onclick="changePage(-1)" class="page-btn flex items-center gap-3 px-6 py-3 border border-neon-red/50 text-neon-red font-heading font-bold text-xs uppercase tracking-widest hover:bg-neon-red hover:text-black transition-all cyber-cut-sm">
+                        <i class="bi bi-chevron-left"></i> PREV_LOG
+                    </button>
+                    
+                    <div class="font-mono text-gray-500 text-xs">
+                        PAGE <span id="currentPage" class="text-white font-bold">1</span> OF <span id="totalPages">1</span>
+                    </div>
+
+                    <button id="nextBtn" onclick="changePage(1)" class="page-btn flex items-center gap-3 px-6 py-3 border border-neon-red/50 text-neon-red font-heading font-bold text-xs uppercase tracking-widest hover:bg-neon-red hover:text-black transition-all cyber-cut-sm">
+                        NEXT_LOG <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div id="noResults" class="hidden text-center py-20 border border-border bg-card cyber-cut">
+                    <i class="bi bi-exclamation-triangle text-4xl text-neon-red mb-4 block"></i>
+                    <h3 class="font-heading text-xl text-white mb-2">DATA_NOT_FOUND</h3>
+                    <p class="text-gray-500 font-mono text-sm">Query pencarian tidak cocok dengan arsip manapun.</p>
+                </div>
+
+            </section>
+
+            <footer class="bg-panel border-t border-border pt-16 pb-8 px-6 lg:px-20 relative overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 relative z-10">
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="flex items-center gap-2 mb-6">
+                            <i class="bi bi-cpu-fill text-neon text-2xl"></i>
+                            <span class="font-heading font-bold text-white text-2xl tracking-widest">LOGIC_ID</span>
+                        </div>
+                        <p class="text-gray-500 text-sm font-mono max-w-sm mb-6">
+                            Logic_ID Systems Integrated.<br>
+                            Membangun ekosistem digital yang aman, cepat, dan skalabel untuk entitas masa depan.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-linkedin"></i></a>
+                            <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <h4 class="text-white font-heading font-bold mb-6 uppercase border-l-2 border-neon pl-3">Navigation</h4>
+                        <ul class="space-y-3 text-sm text-gray-500 font-mono">
+                            <li><a href="index.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Dashboard</a></li>
+                            <li><a href="about.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> System Info</a></li>
+                            <li><a href="services.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Modules</a></li>
+                            <li><a href="portfolio.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Database</a></li>
+                        </ul>
+                    </div>
+                    <div class="hidden md:block">
+                        <h4 class="text-white font-heading font-bold mb-6 uppercase border-l-2 border-neon-pink pl-3">Legal</h4>
+                        <ul class="space-y-3 text-sm text-gray-500 font-mono">
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Privacy Protocol</a></li>
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Terms of Service</a></li>
+                            <li><a href="#" class="hover:text-neon-pink transition-colors">>> Disclaimer</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border-t border-border/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 font-mono relative z-10">
+                    <p>&copy; 2026 LOGIC_ID SYSTEMS. ALL RIGHTS RESERVED.</p>
+                    <p>STATUS: <span class="text-neon animate-pulse">ONLINE</span> // SERVER: ID_JKT_01</p>
+                </div>
+
+                <div class="absolute bottom-0 right-0 w-64 h-64 bg-neon/5 blur-[80px] pointer-events-none"></div>
+            </footer>
+
+        </main>
+    </div>
+
+    <div class="fixed bottom-6 right-6 z-[40] flex flex-col gap-4">
+        <button id="scrollTopBtn" onclick="scrollToTop()" class="w-12 h-12 bg-card border border-neon text-neon flex items-center justify-center shadow-[0_0_15px_#00ff8850] hover:bg-neon hover:text-black transition-all translate-y-20 opacity-0 cyber-cut-sm">
+            <i class="bi bi-arrow-up text-2xl font-bold"></i>
+        </button>
+        <a href="https://wa.me/628123456789?text=Halo%20Logic_ID%2C%20saya%20tertarik%20dengan%20artikel%20di%20blog%20Anda." target="_blank" class="w-12 h-12 bg-[#25D366] text-white flex items-center justify-center shadow-[0_0_15px_#25D36680] hover:scale-110 transition-transform cyber-cut-sm border border-white/20">
+            <i class="bi bi-whatsapp text-2xl"></i>
+        </a>
+    </div>
+
+    <div id="mobile-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/80 z-[90] hidden lg:hidden backdrop-blur-sm transition-opacity"></div>
+
+    <script>
+        // === BLOG DATA & LOGIC ===
+        const blogData = [
+            {
+                id: 1,
+                date: "2026.01.16",
+                category: "TECHNOLOGY",
+                title: "Optimizing React Rendering for High-Load Systems",
+                excerpt: "Analisis mendalam tentang penggunaan React Compiler dan Server Components untuk performa maksimal.",
+                image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070"
+            },
+            {
+                id: 2,
+                date: "2026.01.12",
+                category: "DESIGN",
+                title: "The Rise of Brutalist Web Design in 2026",
+                excerpt: "Mengapa desain anti-estetika menjadi standar baru untuk agensi teknologi modern.",
+                image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070"
+            },
+            {
+                id: 3,
+                date: "2026.01.05",
+                category: "SECURITY",
+                title: "Securing API Endpoints with JWT & OAuth2",
+                excerpt: "Protokol keamanan wajib untuk mencegah kebocoran data klien pada sistem skala besar.",
+                image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470"
+            },
+            {
+                id: 4,
+                date: "2025.12.28",
+                category: "AI",
+                title: "Integrating LLMs into Legacy Infrastructure",
+                excerpt: "Cara menghubungkan model bahasa besar ke database SQL lama tanpa merusak struktur data.",
+                image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070"
+            },
+            {
+                id: 5,
+                date: "2025.12.15",
+                category: "CLOUD",
+                title: "Serverless Architecture: The Cost Benefit Analysis",
+                excerpt: "Kapan saatnya beralih ke AWS Lambda dan kapan harus tetap menggunakan VPS tradisional.",
+                image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072"
+            },
+            {
+                id: 6,
+                date: "2025.12.01",
+                category: "MOBILE",
+                title: "Flutter vs React Native: Performance Benchmarks",
+                excerpt: "Uji coba rendering frame per second pada aplikasi kompleks dengan animasi berat.",
+                image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=2070"
+            },
+            {
+                id: 7,
+                date: "2025.11.20",
+                category: "DEVOPS",
+                title: "Automating Deployment Pipelines with Docker",
+                excerpt: "Mengurangi waktu downtime hingga 0% menggunakan teknik blue-green deployment.",
+                image: "https://images.unsplash.com/photo-1667372393119-c81c0cda0a29?q=80&w=2070"
+            },
+            {
+                id: 8,
+                date: "2025.11.10",
+                category: "DESIGN",
+                title: "Dark Mode UI: Accessibility Standards",
+                excerpt: "Menciptakan kontras yang nyaman untuk mata tanpa mengorbankan estetika cyberpunk.",
+                image: "https://images.unsplash.com/photo-1550063873-ab792950096b?q=80&w=2070"
+            },
+            {
+                id: 9,
+                date: "2025.10.30",
+                category: "SECURITY",
+                title: "Zero Trust Network Access Implementation",
+                excerpt: "Mengapa VPN tradisional sudah usang dan bagaimana ZTNA menggantikannya.",
+                image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=2070"
+            }
+        ];
+
+        const itemsPerPage = 6;
+        let currentPage = 1;
+        let filteredPosts = [...blogData]; // Start with all data
+
+        const gridElement = document.getElementById('blog-grid');
+        const searchInput = document.getElementById('searchInput');
+        const searchStats = document.getElementById('searchStats');
+        const noResults = document.getElementById('noResults');
+        const paginationContainer = document.getElementById('pagination');
+        const pageLabel = document.getElementById('currentPage');
+        const totalLabel = document.getElementById('totalPages');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function renderPosts() {
+            // Clear Grid
+            gridElement.innerHTML = '';
+
+            // Calculate Pagination
+            const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredPosts.slice(start, end);
+
+            // Update Stats & UI States
+            totalLabel.innerText = totalPages || 1;
+            pageLabel.innerText = currentPage;
+            searchStats.innerText = `FOUND ${filteredPosts.length} FRAGMENTS`;
+
+            if (filteredPosts.length === 0) {
+                noResults.classList.remove('hidden');
+                paginationContainer.classList.add('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                paginationContainer.classList.remove('hidden');
+            }
+
+            // Button States
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+            // Generate HTML
+            pageItems.forEach(post => {
+                const card = document.createElement('article');
+                card.className = "bg-void border border-border p-0 cyber-cut-sm hover:border-neon-red transition-all group flex flex-col h-full overflow-hidden";
+                card.innerHTML = `
+                    <div class="h-48 overflow-hidden border-b border-border relative">
+                        <img src="${post.image}" alt="${post.title}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute top-4 right-4 bg-black/80 border border-neon-red text-neon-red text-[10px] px-2 py-1 font-mono">${post.category}</div>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <div class="text-gray-500 text-xs font-mono mb-3 border-b border-border/50 pb-2 flex justify-between">
+                            <span>LOG_ID: #${1000 + post.id}</span>
+                            <span>${post.date}</span>
+                        </div>
+                        <h3 class="font-heading text-lg text-white mb-4 group-hover:text-neon-red transition-colors leading-tight line-clamp-2">${post.title}</h3>
+                        <p class="text-gray-500 text-sm font-mono flex-1 mb-6 line-clamp-3">${post.excerpt}</p>
+                        <a href="blog-detail.html" class="text-xs font-bold text-white uppercase tracking-widest group-hover:text-neon-red flex items-center gap-2 border-t border-border pt-4">
+                            READ_FILE <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                `;
+                gridElement.appendChild(card);
+            });
+        }
+
+        // Search Function
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            filteredPosts = blogData.filter(post => 
+                post.title.toLowerCase().includes(query) || 
+                post.category.toLowerCase().includes(query) ||
+                post.excerpt.toLowerCase().includes(query)
+            );
+            currentPage = 1; // Reset to page 1 on new search
+            renderPosts();
+        });
+
+        // Pagination Function
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
+            const newPage = currentPage + direction;
+
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderPosts();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Initial Render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPosts();
+        });
+
+        // === SIDEBAR LOGIC (SAME AS INDEX) ===
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('toggle-icon');
+            const isCollapsed = sidebar.classList.toggle('collapsed');
+            
+            if (isCollapsed) {
+                sidebar.style.setProperty('--sidebar-width', 'var(--sidebar-collapsed-width)');
+                icon.className = 'bi bi-chevron-right';
+            } else {
+                sidebar.style.setProperty('--sidebar-width', '280px');
+                icon.className = 'bi bi-chevron-left';
+            }
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('mobile-active');
+            if (sidebar.classList.contains('mobile-active')) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        const mainContent = document.querySelector('main');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+        mainContent.addEventListener('scroll', () => {
+            if (mainContent.scrollTop > 300) {
+                scrollTopBtn.classList.remove('translate-y-20', 'opacity-0');
+            } else {
+                scrollTopBtn.classList.add('translate-y-20', 'opacity-0');
+            }
+        });
+
+        function scrollToTop() {
+            mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
