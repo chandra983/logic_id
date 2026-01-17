@@ -240,7 +240,7 @@
                 </div>
 
                 <div class="max-w-7xl mx-auto px-6 lg:px-20 py-12 lg:py-20">
-                    <div class="flex flex-col lg:flex-row gap-16">
+                    <div class="flex flex-col-reverse lg:flex-row gap-16">
                         
                         <div class="w-full lg:w-3/4 article-content" id="article-content">
                             
@@ -331,6 +331,24 @@
                                 Optimasi bukan tujuan akhir, melainkan proses berkelanjutan. Dengan memanfaatkan React Compiler dan Server Components, kita dapat membangun sistem yang tidak hanya cepat saat peluncuran, tetapi tetap responsif seiring bertambahnya kompleksitas fitur.
                             </p>
 
+                            <div class="mt-12 block lg:hidden">
+                                <p class="text-xs text-gray-500 font-mono mb-4 uppercase tracking-widest">Share Transmission</p>
+                                <div class="flex gap-2">
+                                    <button onclick="shareSocial('whatsapp')" class="flex-1 bg-[#25D366]/10 border border-[#25D366] text-[#25D366] py-3 hover:bg-[#25D366] hover:text-black transition-all cyber-cut-sm">
+                                        <i class="bi bi-whatsapp"></i>
+                                    </button>
+                                    <button onclick="shareSocial('twitter')" class="flex-1 bg-white/10 border border-white text-white py-3 hover:bg-white hover:text-black transition-all cyber-cut-sm">
+                                        <i class="bi bi-twitter-x"></i>
+                                    </button>
+                                    <button onclick="shareSocial('linkedin')" class="flex-1 bg-[#0077b5]/10 border border-[#0077b5] text-[#0077b5] py-3 hover:bg-[#0077b5] hover:text-white transition-all cyber-cut-sm">
+                                        <i class="bi bi-linkedin"></i>
+                                    </button>
+                                    <button onclick="shareSocial('facebook')" class="flex-1 bg-[#1877F2]/10 border border-[#1877F2] text-[#1877F2] py-3 hover:bg-[#1877F2] hover:text-white transition-all cyber-cut-sm">
+                                        <i class="bi bi-facebook"></i>
+                                    </button>
+                                </div>
+                            </div>
+
                         </div>
 
                         <aside class="w-full lg:w-1/4 space-y-8">
@@ -340,15 +358,15 @@
                                     <div class="flex justify-between items-center mb-4 border-b border-border/50 pb-2">
                                         <h3 class="font-heading text-neon-red text-sm font-bold uppercase tracking-widest">Table of Contents</h3>
                                         <button onclick="toggleTOC()" class="text-gray-500 hover:text-white">
-                                            <i class="bi bi-dash-lg"></i>
+                                            <i id="toc-icon" class="bi bi-dash-lg"></i>
                                         </button>
                                     </div>
-                                    <div id="toc-container" class="transition-all duration-300 overflow-hidden">
+                                    <div id="toc-container" class="transition-all duration-300 overflow-hidden" style="max-height: 2000px;">
                                         <nav id="toc-list" class="space-y-2 font-mono text-xs"></nav>
                                     </div>
                                 </div>
 
-                                <div class="mt-8">
+                                <div class="mt-8 hidden lg:block">
                                     <p class="text-xs text-gray-500 font-mono mb-4 uppercase tracking-widest">Share Transmission</p>
                                     <div class="flex gap-2">
                                         <button onclick="shareSocial('whatsapp')" class="flex-1 bg-[#25D366]/10 border border-[#25D366] text-[#25D366] py-2 hover:bg-[#25D366] hover:text-black transition-all cyber-cut-sm">
@@ -524,17 +542,25 @@
             });
         });
 
-        // Toggle TOC Visibility
+        // Toggle TOC Visibility (Fixed Logic)
         function toggleTOC() {
             const container = document.getElementById('toc-container');
-            if (container.style.maxHeight) {
-                container.style.maxHeight = null;
-            } else {
+            const icon = document.getElementById('toc-icon');
+            
+            if (container.style.maxHeight === '0px') {
                 container.style.maxHeight = container.scrollHeight + "px";
+                icon.className = 'bi bi-dash-lg'; // Icon Open (Minus)
+            } else {
+                container.style.maxHeight = '0px';
+                icon.className = 'bi bi-plus-lg'; // Icon Closed (Plus)
             }
         }
-        // Initialize TOC open
-        document.getElementById('toc-container').style.maxHeight = "500px";
+        
+        // Initialize TOC logic on load
+        const tocContainer = document.getElementById('toc-container');
+        if (tocContainer) {
+            tocContainer.style.maxHeight = tocContainer.scrollHeight + "px"; // Start Open
+        }
 
         // === SHARE FUNCTIONALITY ===
         function shareSocial(platform) {
