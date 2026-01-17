@@ -206,16 +206,16 @@
 
                 <div class="z-10 max-w-6xl w-full">
                     <div class="inline-block px-3 py-1 border border-neon-pink/30 bg-neon-pink/5 text-neon-pink text-xs font-mono cyber-cut-sm mb-6">
-                        <i class="bi bi-database-check mr-2"></i>DATABASE_ACCESS
+                        <i class="bi bi-database-check mr-2"></i>WEB_PROJECTS.DB
                     </div>
                     
                     <h1 class="font-heading text-4xl lg:text-7xl font-black text-white leading-[0.9] mb-6 uppercase tracking-tighter">
-                        MISSION <br>
+                        WEB <br>
                         <span class="glitch inline-block text-white" data-text="ARCHIVES">ARCHIVES</span>
                     </h1>
                     
                     <p class="text-gray-400 text-lg max-w-2xl leading-relaxed border-l-4 border-neon-pink pl-6">
-                        Kumpulan studi kasus dan deployment sukses. Bukti nyata keunggulan infrastruktur digital yang kami bangun.
+                        Koleksi proyek website berkinerja tinggi yang telah kami deploy. Dari landing page korporat hingga aplikasi web berskala besar.
                     </p>
                 </div>
             </section>
@@ -226,109 +226,109 @@
                     <button onclick="filterProjects('all')" class="filter-btn active px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-white data-[active=true]:bg-white data-[active=true]:text-black data-[active=true]:border-white text-gray-500" data-active="true">
                         SEMUA
                     </button>
-                    <button onclick="filterProjects('web')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon-blue/50 data-[active=true]:bg-neon-blue data-[active=true]:text-black data-[active=true]:border-neon-blue text-gray-500">
-                        WEBSITE
+                    <button onclick="filterProjects('corp')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon-blue/50 data-[active=true]:bg-neon-blue data-[active=true]:text-black data-[active=true]:border-neon-blue text-gray-500">
+                        CORPORATE
                     </button>
-                    <button onclick="filterProjects('app')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon-pink/50 data-[active=true]:bg-neon-pink data-[active=true]:text-black data-[active=true]:border-neon-pink text-gray-500">
-                        MOBILE APPS
+                    <button onclick="filterProjects('ecom')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon-pink/50 data-[active=true]:bg-neon-pink data-[active=true]:text-black data-[active=true]:border-neon-pink text-gray-500">
+                        E-COMMERCE
                     </button>
-                    <button onclick="filterProjects('marketing')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon/50 data-[active=true]:bg-neon data-[active=true]:text-black data-[active=true]:border-neon text-gray-500">
-                        MARKETING
+                    <button onclick="filterProjects('webapp')" class="filter-btn px-6 py-3 font-heading font-bold text-xs uppercase tracking-widest border border-border cyber-cut-sm transition-all duration-300 hover:text-white hover:border-neon/50 data-[active=true]:bg-neon data-[active=true]:text-black data-[active=true]:border-neon text-gray-500">
+                        WEB APPS
                     </button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-grid">
                     
-                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-blue transition-all duration-300" data-category="web">
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-blue transition-all duration-300" data-category="corp">
                         <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
                             <div class="absolute inset-0 bg-neon-blue/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-blue text-neon-blue text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Deployed</div>
+                            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-blue text-neon-blue text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Active</div>
                         </div>
                         <div class="p-6 relative">
-                            <p class="text-neon-blue font-mono text-xs mb-2 tracking-widest">> E-COMMERCE</p>
-                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-blue transition-colors">Neo_Marketplace</h3>
-                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Platform belanja dengan sistem inventory real-time dan payment gateway terintegrasi.</p>
+                            <p class="text-neon-blue font-mono text-xs mb-2 tracking-widest">> COMPANY_PROFILE</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-blue transition-colors">Tech_Vision_Corp</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Website profil perusahaan teknologi dengan animasi interaktif dan integrasi karir.</p>
                             <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon-blue hover:text-black hover:border-neon-blue transition-all cyber-cut-sm">
                                 VIEW DETAIL
                             </button>
                         </div>
                     </div>
 
-                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-blue transition-all duration-300" data-category="web">
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-blue transition-all duration-300" data-category="corp">
                         <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
                             <div class="absolute inset-0 bg-neon-blue/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-blue text-neon-blue text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Deployed</div>
+                            <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-blue text-neon-blue text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Active</div>
                         </div>
                         <div class="p-6 relative">
-                            <p class="text-neon-blue font-mono text-xs mb-2 tracking-widest">> FINTECH_WEB</p>
-                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-blue transition-colors">Core_Finance</h3>
-                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Dashboard keuangan korporat dengan visualisasi data kompleks dan keamanan tinggi.</p>
+                            <p class="text-neon-blue font-mono text-xs mb-2 tracking-widest">> CONSTRUCTION_WEB</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-blue transition-colors">Archi_Construct</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Portofolio digital untuk perusahaan konstruksi, menampilkan galeri proyek resolusi tinggi.</p>
                             <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon-blue hover:text-black hover:border-neon-blue transition-all cyber-cut-sm">
                                 VIEW DETAIL
                             </button>
                         </div>
                     </div>
 
-                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-pink transition-all duration-300" data-category="app">
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-pink transition-all duration-300" data-category="ecom">
                         <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
                             <div class="absolute inset-0 bg-neon-pink/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-pink text-neon-pink text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Active</div>
+                            <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-pink text-neon-pink text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Deployed</div>
                         </div>
                         <div class="p-6 relative">
-                            <p class="text-neon-pink font-mono text-xs mb-2 tracking-widest">> MOBILE_HEALTH</p>
-                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-pink transition-colors">Vital_Track</h3>
-                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Aplikasi monitoring kesehatan dengan integrasi IoT wearables.</p>
+                            <p class="text-neon-pink font-mono text-xs mb-2 tracking-widest">> ONLINE_STORE</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-pink transition-colors">Neon_Shop</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Toko fashion online dengan sistem manajemen inventaris real-time dan payment gateway.</p>
                             <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon-pink hover:text-black hover:border-neon-pink transition-all cyber-cut-sm">
                                 VIEW DETAIL
                             </button>
                         </div>
                     </div>
 
-                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-pink transition-all duration-300" data-category="app">
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon-pink transition-all duration-300" data-category="ecom">
                         <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
                             <div class="absolute inset-0 bg-neon-pink/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <img src="https://images.unsplash.com/photo-1555421689-491a97ff2040?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-pink text-neon-pink text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Active</div>
+                            <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2101" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon-pink text-neon-pink text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Deployed</div>
                         </div>
                         <div class="p-6 relative">
-                            <p class="text-neon-pink font-mono text-xs mb-2 tracking-widest">> LOGISTICS</p>
-                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-pink transition-colors">Swift_Cargo</h3>
-                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Sistem tracking pengiriman barang real-time dengan optimasi rute AI.</p>
+                            <p class="text-neon-pink font-mono text-xs mb-2 tracking-widest">> TECH_MARKETPLACE</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon-pink transition-colors">Gadget_Hub</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Marketplace elektronik multi-vendor dengan fitur perbandingan spesifikasi produk.</p>
                             <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon-pink hover:text-black hover:border-neon-pink transition-all cyber-cut-sm">
                                 VIEW DETAIL
                             </button>
                         </div>
                     </div>
 
-                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon transition-all duration-300" data-category="marketing">
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon transition-all duration-300" data-category="webapp">
                         <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
                             <div class="absolute inset-0 bg-neon/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <img src="https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?q=80&w=2074" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon text-neon text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Done</div>
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon text-neon text-[10px] px-2 py-1 font-mono uppercase tracking-widest">SaaS</div>
                         </div>
                         <div class="p-6 relative">
-                            <p class="text-neon font-mono text-xs mb-2 tracking-widest">> SEO_CAMPAIGN</p>
-                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon transition-colors">Global_Reach</h3>
-                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Peningkatan traffic organik sebesar 300% dalam 6 bulan untuk klien internasional.</p>
+                            <p class="text-neon font-mono text-xs mb-2 tracking-widest">> PROJECT_TOOL</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon transition-colors">Task_Flow_SaaS</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Aplikasi manajemen proyek kolaboratif berbasis web dengan fitur real-time chat.</p>
                             <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon hover:text-black hover:border-neon transition-all cyber-cut-sm">
                                 VIEW DETAIL
                             </button>
                         </div>
                     </div>
 
-                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon transition-all duration-300" data-category="marketing">
+                    <div class="project-card group bg-card border border-border cyber-cut overflow-hidden hover:border-neon transition-all duration-300" data-category="webapp">
                         <div class="relative h-56 w-full overflow-hidden border-b border-border/50">
                             <div class="absolute inset-0 bg-neon/5 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <img src="https://images.unsplash.com/photo-1557838923-2985c318be48?q=80&w=2031" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon text-neon text-[10px] px-2 py-1 font-mono uppercase tracking-widest">Done</div>
+                            <img src="https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=2574" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                            <div class="absolute top-4 right-4 z-20 bg-black/80 border border-neon text-neon text-[10px] px-2 py-1 font-mono uppercase tracking-widest">SaaS</div>
                         </div>
                         <div class="p-6 relative">
-                            <p class="text-neon font-mono text-xs mb-2 tracking-widest">> SOCIAL_ADS</p>
-                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon transition-colors">Viral_Boost</h3>
-                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Kampanye iklan media sosial terarah dengan ROAS (Return on Ad Spend) 5x lipat.</p>
+                            <p class="text-neon font-mono text-xs mb-2 tracking-widest">> FINANCE_DASHBOARD</p>
+                            <h3 class="font-heading text-xl text-white mb-2 uppercase group-hover:text-neon transition-colors">Fin_Dash_Pro</h3>
+                            <p class="text-gray-500 text-xs font-mono mb-6 line-clamp-2">Dashboard analitik keuangan untuk enterprise dengan visualisasi data kompleks.</p>
                             <button class="w-full text-xs font-bold text-white uppercase tracking-widest border border-border py-3 hover:bg-neon hover:text-black hover:border-neon transition-all cyber-cut-sm">
                                 VIEW DETAIL
                             </button>
@@ -340,20 +340,20 @@
 
             <section class="py-12 border-y border-border bg-card/50 overflow-hidden">
                 <div class="mb-8 text-center">
-                    <p class="text-gray-500 text-xs font-mono tracking-[0.3em] uppercase">Trusted By Major Systems</p>
+                    <p class="text-gray-500 text-xs font-mono tracking-[0.3em] uppercase">Trusted By Major Tech</p>
                 </div>
                 <div class="relative w-full overflow-hidden">
                     <div class="flex animate-marquee gap-24 whitespace-nowrap min-w-full items-center">
                         <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">CYBER_DYNAMICS</span>
-                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">NEXUS_CORE_LTD</span>
-                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">OMEGA_FINANCE</span>
-                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">VERTEX_GLOBAL</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">NEXUS_WEB_CORP</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">OMEGA_COMMERCE</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">VERTEX_SaaS</span>
                         <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">SYNTH_LABS</span>
                         <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">QUANTUM_SOFT</span>
                         <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">CYBER_DYNAMICS</span>
-                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">NEXUS_CORE_LTD</span>
-                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">OMEGA_FINANCE</span>
-                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">VERTEX_GLOBAL</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">NEXUS_WEB_CORP</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">OMEGA_COMMERCE</span>
+                        <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">VERTEX_SaaS</span>
                         <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">SYNTH_LABS</span>
                         <span class="text-2xl font-heading font-bold text-gray-600 hover:text-white transition-colors cursor-default">QUANTUM_SOFT</span>
                     </div>
@@ -373,15 +373,15 @@
                                         <span class="text-neon-pink font-mono text-xs tracking-widest">SYSTEM_UPLINK</span>
                                     </div>
                                     <h2 class="font-heading text-3xl lg:text-5xl text-white mb-4 uppercase leading-tight">
-                                        Build Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-blue">Legacy</span>
+                                        Build Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-neon-blue">Website</span>
                                     </h2>
                                     <p class="text-gray-400 font-mono text-sm lg:text-base leading-relaxed">
-                                        Lihat apa yang bisa kami bangun untuk Anda. Konsultasikan kebutuhan proyek Anda sekarang.
+                                        Punya ide untuk website baru? Mari diskusikan arsitektur dan teknologi yang tepat untuk proyek Anda.
                                     </p>
                                 </div>
 
                                 <div class="flex-shrink-0">
-                                    <a href="https://wa.me/628123456789?text=Halo%20Logic_ID%2C%20saya%20ingin%20diskusi%20project%20baru." target="_blank" class="relative group overflow-hidden px-8 py-6 bg-neon-pink text-black font-heading font-bold text-xl uppercase tracking-widest cyber-cut hover:bg-white transition-colors duration-300 shadow-[0_0_20px_rgba(255,0,255,0.3)] inline-block text-center">
+                                    <a href="https://wa.me/628123456789?text=Halo%20Logic_ID%2C%20saya%20ingin%20diskusi%20project%20website%20baru." target="_blank" class="relative group overflow-hidden px-8 py-6 bg-neon-pink text-black font-heading font-bold text-xl uppercase tracking-widest cyber-cut hover:bg-white transition-colors duration-300 shadow-[0_0_20px_rgba(255,0,255,0.3)] inline-block text-center">
                                         <span class="relative z-10 flex items-center gap-3">
                                             CHAT_WHATSAPP <i class="bi bi-whatsapp text-2xl"></i>
                                         </span>
@@ -402,8 +402,8 @@
                             <span class="font-heading font-bold text-white text-2xl tracking-widest">LOGIC_ID</span>
                         </div>
                         <p class="text-gray-500 text-sm font-mono max-w-sm mb-6">
-                            Logic_ID Systems Integrated.<br>
-                            Membangun ekosistem digital yang aman, cepat, dan skalabel untuk entitas masa depan.
+                            Logic_ID Web Architects.<br>
+                            Membangun ekosistem website yang aman, cepat, dan skalabel untuk entitas masa depan.
                         </p>
                         <div class="flex gap-4">
                             <a href="#" class="w-10 h-10 border border-border flex items-center justify-center text-gray-400 hover:text-neon hover:border-neon transition-all cyber-cut-sm"><i class="bi bi-instagram"></i></a>
@@ -416,7 +416,7 @@
                         <ul class="space-y-3 text-sm text-gray-500 font-mono">
                             <li><a href="index.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Dashboard</a></li>
                             <li><a href="about.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> System Info</a></li>
-                            <li><a href="services.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Modules</a></li>
+                            <li><a href="services.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Web Modules</a></li>
                             <li><a href="portfolio.html" class="hover:text-neon transition-colors hover:translate-x-1 inline-block">>> Database</a></li>
                         </ul>
                     </div>
@@ -431,7 +431,7 @@
                 </div>
                 
                 <div class="border-t border-border/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 font-mono relative z-10">
-                    <p>&copy; 2026 LOGIC_ID SYSTEMS. ALL RIGHTS RESERVED.</p>
+                    <p>&copy; 2026 LOGIC_ID. ALL RIGHTS RESERVED.</p>
                     <p>STATUS: <span class="text-neon animate-pulse">ONLINE</span> // SERVER: ID_JKT_01</p>
                 </div>
 
@@ -486,7 +486,7 @@
             filterProjects('all');
         });
 
-        // === SIDEBAR LOGIC (100% SAME AS INDEX.HTML) ===
+        // === SIDEBAR LOGIC (SAME AS INDEX.HTML) ===
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const icon = document.getElementById('toggle-icon');
